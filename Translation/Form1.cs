@@ -37,7 +37,6 @@ namespace Translation
                 AddTranslation();
             cEn_SelectedValueChanged(sender, e);
             textRussian.Text = String.Empty;
-            textEnglish.Text = String.Empty;
             Serialize();
             UpdateText();
         }
@@ -77,6 +76,15 @@ namespace Translation
 
         }
 
+        private void Serialize()
+        {
+            using (var fs = new FileStream("Data.translation", FileMode.OpenOrCreate))
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(fs, dictionary);
+            }
+        }
+
         private void text_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (Char.IsDigit(e.KeyChar) || Char.IsPunctuation(e.KeyChar))
@@ -102,15 +110,6 @@ namespace Translation
             {
                 if (item.Ru.IndexOf(cRu.Text) >= 0)
                     listBox2.Items.Add(item.En);
-            }
-        }
-
-        private void Serialize()
-        {
-            using (var fs = new FileStream("Data.translation", FileMode.OpenOrCreate))
-            {
-                BinaryFormatter bf = new BinaryFormatter();
-                bf.Serialize(fs, dictionary);
             }
         }
 
@@ -141,13 +140,11 @@ namespace Translation
             {
                 if (listBox2.Text == item.En)
                 {
-                    foreach (var item1 in listBox2.SelectedItems)
-                    {
-                        dictionary.Remove(item);
-                    }
+                    dictionary.Remove(item);
                     Serialize();
                     cRu_SelectedValueChanged(sender, e);
                     cEn_SelectedValueChanged(sender, e);
+                    UpdateText();
                     return;
                 }
             }
